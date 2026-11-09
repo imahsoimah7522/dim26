@@ -97,8 +97,7 @@ export function Footer() {
         </div>
 
         <div className="mt-10 border-t border-navy-800 pt-6 text-center text-xs text-navy-500">
-          &copy; {new Date().getFullYear()} DataInsight Mini. Hak cipta
-          dilindungi.
+          &copy; 2026 DataInsight Mini. Hak cipta dilindungi.
         </div>
       </div>
     </footer>
