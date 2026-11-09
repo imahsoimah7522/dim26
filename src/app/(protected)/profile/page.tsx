@@ -3,6 +3,7 @@
 // ===========================================
 // Manajemen profil pengguna.
 
+import { connection } from "next/server";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { ProfileClient } from "./client";
@@ -13,6 +14,7 @@ export const metadata = {
 };
 
 export default async function ProfilePage() {
+  await connection();
   const supabase = await createClient();
 
   const {
