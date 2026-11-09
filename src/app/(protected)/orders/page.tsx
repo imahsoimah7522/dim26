@@ -2,7 +2,7 @@
 // Orders Page — DataInsight Mini
 // ===========================================
 
-import { connection } from "next/server";
+import { Suspense } from "react";
 import { getUserOrders } from "@/features/payment/payment-service";
 import { OrdersClient } from "./client";
 
@@ -11,9 +11,21 @@ export const metadata = {
   description: "Daftar pesanan laporan Anda.",
 };
 
-export default async function OrdersPage() {
-  await connection();
+async function OrdersContent() {
   const { data: orders, error } = await getUserOrders();
-
   return <OrdersClient orders={orders} error={error} />;
+}
+
+export default function OrdersPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex items-center justify-center py-16">
+          <div className="h-8 w-8 animate-spin rounded-full border-4 border-accent-600 border-t-transparent" />
+        </div>
+      }
+    >
+      <OrdersContent />
+    </Suspense>
+  );
 }

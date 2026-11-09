@@ -3,7 +3,7 @@
 // ===========================================
 // Manajemen profil pengguna.
 
-import { connection } from "next/server";
+import { Suspense } from "react";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { ProfileClient } from "./client";
@@ -13,8 +13,7 @@ export const metadata = {
   description: "Kelola profil akun Anda.",
 };
 
-export default async function ProfilePage() {
-  await connection();
+async function ProfileContent() {
   const supabase = await createClient();
 
   const {
@@ -44,5 +43,19 @@ export default async function ProfilePage() {
           : { fullName: "", businessName: "", businessType: "" }
       }
     />
+  );
+}
+
+export default function ProfilePage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex items-center justify-center py-16">
+          <div className="h-8 w-8 animate-spin rounded-full border-4 border-accent-600 border-t-transparent" />
+        </div>
+      }
+    >
+      <ProfileContent />
+    </Suspense>
   );
 }
