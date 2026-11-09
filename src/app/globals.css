@@ -1,0 +1,47 @@
+@import "tailwindcss";
+
+/* ============================================= */
+/* DataInsight Mini — Design System              */
+/* Navy/Blue B2B SaaS Theme                      */
+/* ============================================= */
+
+@theme inline {
+  /* Brand Colors */
+  --color-navy-50: #f0f3f9;
+  --color-navy-100: #dae1f0;
+  --color-navy-200: #b8c6e3;
+  --color-navy-300: #8da5d1;
+  --color-navy-400: #6683be;
+  --color-navy-500: #4a66a8;
+  --color-navy-600: #3b528a;
+  --color-navy-700: #2e4070;
+  --color-navy-800: #1e2d52;
+  --color-navy-900: #0f1b33;
+  --color-navy-950: #080e1b;
+
+  --color-accent-50: #eff6ff;
+  --color-accent-100: #dbeafe;
+  --color-accent-200: #bfdbfe;
+  --color-accent-300: #93c5fd;
+  --color-accent-400: #60a5fa;
+  --color-accent-500: #3b82f6;
+  --color-accent-600: #2563eb;
+  --color-accent-700: #1d4ed8;
+
+  /* Semantic Colors */
+  --color-background: #ffffff;
+  --color-foreground: #0f1b33;
+  --color-muted: #f8fafc;
+  --color-muted-foreground: #64748b;
+  --color-border: #e2e8f0;
+  --color-ring: #3b82f6;
+
+  /* Success / Warning / Danger */
+  --color-success: #16a34a;
+  --color-warning: #f59e0b;
+  --color-danger: #dc2626;
+
+  /* Typography */
+  --font-sans: var(--font-geist-sans), system-ui, -apple-system, sans-serif;
+  --font-mono: var(--font-geist-mono), monospace;
+}
