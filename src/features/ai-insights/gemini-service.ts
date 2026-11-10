@@ -1,18 +1,16 @@
 // ===========================================
-// DataInsight Mini — Gemini Service
+// DataInsight Mini — AI Service
 // ===========================================
-// SERVER-SIDE ONLY. Calls Gemini API to generate
+// SERVER-SIDE ONLY. Calls OpenAI-compatible API to generate
 // business insights from analytical summaries.
 // NEVER import this in client code.
 
-import { GoogleGenerativeAI } from "@google/generative-ai";
 import { insightResponseSchema } from "./insight-schemas";
 import type { InsightRequestInput } from "./insight-schemas";
 import type { InsightResponse } from "./insight-types";
 
 // ── Constants ───────────────────────────────────
 
-const MODEL_NAME = "gemini-2.0-flash";
 const MAX_OUTPUT_TOKENS = 4096;
 const TEMPERATURE = 0.3; // Low temperature for factual analysis
 const REQUEST_TIMEOUT_MS = 30_000;
@@ -156,53 +154,83 @@ function formatForPrompt(value: number): string {
   return "Rp" + Math.round(value).toLocaleString("id-ID");
 }
 
-// ── Main Service ────────────────────────────────
+// ── OpenAI-Compatible API Call ──────────────────
+
+interface OpenAIChatResponse {
+  choices: Array<{
+    message: {
+      content: string;
+    };
+  }>;
+}
 
 /**
- * Generate business insights using Gemini API.
- * SERVER-SIDE ONLY — requires GEMINI_API_KEY env var.
+ * Generate business insights using OpenAI-compatible API.
+ * SERVER-SIDE ONLY — requires AI_API_KEY, AI_BASE_URL env vars.
  */
 export async function generateInsights(
   input: InsightRequestInput
 ): Promise<InsightResponse> {
-  const apiKey = process.env.GEMINI_API_KEY;
-  if (!apiKey) {
+  const apiKey = process.env.AI_API_KEY;
+  const baseUrl = process.env.AI_BASE_URL;
+  const model = process.env.AI_MODEL ?? "auto";
+
+  if (!apiKey || !baseUrl) {
     throw new GeminiServiceError(
-      "GEMINI_API_KEY tidak dikonfigurasi di server.",
+      "AI_API_KEY atau AI_BASE_URL tidak dikonfigurasi di server.",
       "CONFIG_ERROR"
     );
   }
 
-  const genAI = new GoogleGenerativeAI(apiKey);
-  const model = genAI.getGenerativeModel({
-    model: MODEL_NAME,
-    generationConfig: {
-      maxOutputTokens: MAX_OUTPUT_TOKENS,
-      temperature: TEMPERATURE,
-      responseMimeType: "application/json",
-    },
-    systemInstruction: SYSTEM_INSTRUCTION,
-  });
-
   const userPrompt = buildUserPrompt(input);
 
-  // Call Gemini with timeout
+  // Call OpenAI-compatible API with timeout
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
 
   try {
-    const result = await model.generateContent({
-      contents: [{ role: "user", parts: [{ text: userPrompt }] }],
+    const response = await fetch(`${baseUrl}/chat/completions`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${apiKey}`,
+      },
+      body: JSON.stringify({
+        model,
+        messages: [
+          { role: "system", content: SYSTEM_INSTRUCTION },
+          { role: "user", content: userPrompt },
+        ],
+        max_tokens: MAX_OUTPUT_TOKENS,
+        temperature: TEMPERATURE,
+        response_format: { type: "json_object" },
+      }),
+      signal: controller.signal,
     });
 
     clearTimeout(timeoutId);
 
-    const response = result.response;
-    const text = response.text();
+    if (!response.ok) {
+      if (response.status === 429) {
+        throw new GeminiServiceError(
+          "Batas penggunaan AI tercapai. Coba lagi nanti.",
+          "RATE_LIMIT"
+        );
+      }
+      const errorText = await response.text().catch(() => "Unknown error");
+      throw new GeminiServiceError(
+        `AI API error (${response.status}): ${errorText}`,
+        "API_ERROR"
+      );
+    }
+
+    const data = (await response.json()) as OpenAIChatResponse;
+
+    const text = data.choices?.[0]?.message?.content;
 
     if (!text || text.trim() === "") {
       throw new GeminiServiceError(
-        "Gemini tidak mengembalikan respons.",
+        "AI tidak mengembalikan respons.",
         "EMPTY_RESPONSE"
       );
     }
@@ -245,14 +273,6 @@ export async function generateInsights(
         throw new GeminiServiceError(
           "Permintaan ke AI melebihi batas waktu (30 detik).",
           "TIMEOUT"
-        );
-      }
-
-      // Rate limit
-      if (error.message.includes("429") || error.message.includes("RESOURCE_EXHAUSTED")) {
-        throw new GeminiServiceError(
-          "Batas penggunaan AI tercapai. Coba lagi nanti.",
-          "RATE_LIMIT"
         );
       }
 

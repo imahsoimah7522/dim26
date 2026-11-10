@@ -21,7 +21,9 @@ export const clientEnvSchema = z.object({
  */
 export const serverEnvSchema = z.object({
   SUPABASE_SERVICE_ROLE_KEY: z.string().min(1),
-  GEMINI_API_KEY: z.string().min(1),
+  AI_API_KEY: z.string().min(1),
+  AI_BASE_URL: z.string().url(),
+  AI_MODEL: z.string().min(1).optional(),
   PAYMENT_SECRET_KEY: z.string().min(1),
   PAYMENT_WEBHOOK_SECRET: z.string().min(1),
 });
