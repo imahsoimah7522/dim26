@@ -65,7 +65,7 @@ export function InsightPanel({ response, isDemo = false }: InsightPanelProps) {
             AI Business Insights
           </h2>
           <p className="text-xs text-muted-foreground">
-            Dihasilkan oleh AI berdasarkan ringkasan analisis
+            Dihasilkan oleh Open Source AI berdasarkan ringkasan analisis
           </p>
         </div>
       </div>
@@ -220,7 +220,7 @@ export function InsightPanel({ response, isDemo = false }: InsightPanelProps) {
 
       {/* Disclaimer */}
       <div className="rounded-lg bg-muted p-3 text-center text-xs text-muted-foreground">
-        Insight ini dihasilkan oleh AI berdasarkan ringkasan data Anda.
+        Insight ini dihasilkan oleh Open Source AI berdasarkan ringkasan data Anda.
         Selalu verifikasi rekomendasi sebelum mengambil keputusan bisnis.
       </div>
     </div>

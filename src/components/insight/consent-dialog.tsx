@@ -39,7 +39,7 @@ export function ConsentDialog({ onAccept, onDecline }: ConsentDialogProps) {
         <div className="mt-3 space-y-2 text-sm text-navy-700">
           <p>
             Untuk menghasilkan insight bisnis, ringkasan analisis Anda akan
-            dikirim ke AI untuk dianalisis.
+            dikirim ke Open Source AI untuk dianalisis.
           </p>
           <p className="font-medium">Yang akan dikirim:</p>
           <ul className="ml-4 list-disc space-y-1 text-muted-foreground">
