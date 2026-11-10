@@ -13,7 +13,7 @@ import type { InsightResponse } from "./insight-types";
 
 const MAX_OUTPUT_TOKENS = 4096;
 const TEMPERATURE = 0.3; // Low temperature for factual analysis
-const REQUEST_TIMEOUT_MS = 30_000;
+const REQUEST_TIMEOUT_MS = 120_000;
 
 // ── System Instruction ──────────────────────────
 
@@ -159,7 +159,8 @@ function formatForPrompt(value: number): string {
 interface OpenAIChatResponse {
   choices: Array<{
     message: {
-      content: string;
+      content?: string;
+      reasoning?: string;
     };
   }>;
 }
@@ -226,7 +227,9 @@ export async function generateInsights(
 
     const data = (await response.json()) as OpenAIChatResponse;
 
-    const text = data.choices?.[0]?.message?.content;
+    // Support both standard `content` and provider-specific `reasoning` field
+    const msg = data.choices?.[0]?.message;
+    const text = msg?.content || msg?.reasoning;
 
     if (!text || text.trim() === "") {
       throw new GeminiServiceError(
@@ -271,7 +274,7 @@ export async function generateInsights(
     if (error instanceof Error) {
       if (error.name === "AbortError") {
         throw new GeminiServiceError(
-          "Permintaan ke AI melebihi batas waktu (30 detik).",
+          "Permintaan ke AI melebihi batas waktu (120 detik).",
           "TIMEOUT"
         );
       }

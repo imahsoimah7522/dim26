@@ -240,7 +240,7 @@ export function InsightLoading() {
           Menghasilkan insight bisnis...
         </p>
         <p className="mt-1 text-xs text-muted-foreground">
-          AI sedang menganalisis ringkasan data Anda
+          AI sedang menganalisis ringkasan data Anda (mungkin butuh 1-2 menit)
         </p>
       </div>
     </div>
