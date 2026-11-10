@@ -204,7 +204,6 @@ export async function generateInsights(
         ],
         max_tokens: MAX_OUTPUT_TOKENS,
         temperature: TEMPERATURE,
-        response_format: { type: "json_object" },
       }),
       signal: controller.signal,
     });
@@ -242,10 +241,19 @@ export async function generateInsights(
     let parsed: unknown;
     try {
       // Strip markdown code block if present
-      const cleaned = text
+      let cleaned = text
         .replace(/^```json?\s*\n?/i, "")
         .replace(/\n?```\s*$/i, "")
         .trim();
+
+      // If text is not valid JSON directly, try to extract JSON object from within
+      if (!cleaned.startsWith("{")) {
+        const jsonMatch = cleaned.match(/\{[\s\S]*\}/);
+        if (jsonMatch) {
+          cleaned = jsonMatch[0];
+        }
+      }
+
       parsed = JSON.parse(cleaned);
     } catch {
       throw new GeminiServiceError(
