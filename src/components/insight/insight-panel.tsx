@@ -21,6 +21,7 @@ import type {
 
 interface InsightPanelProps {
   response: InsightResponse;
+  isDemo?: boolean;
 }
 
 const importanceBadge: Record<
@@ -46,7 +47,12 @@ function Badge({ level }: { level: ImportanceLevel }) {
   );
 }
 
-export function InsightPanel({ response }: InsightPanelProps) {
+export function InsightPanel({ response, isDemo = false }: InsightPanelProps) {
+  // Demo: batasi ke 2 temuan utama saja
+  const keyFindings = isDemo
+    ? response.keyFindings.slice(0, 2)
+    : response.keyFindings;
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -75,16 +81,21 @@ export function InsightPanel({ response }: InsightPanelProps) {
       </div>
 
       {/* Key Findings */}
-      {response.keyFindings.length > 0 && (
+      {keyFindings.length > 0 && (
         <div>
           <div className="mb-3 flex items-center gap-2">
             <Lightbulb className="h-4 w-4 text-accent-600" />
             <h3 className="text-sm font-semibold text-navy-900">
               Temuan Utama
+              {isDemo && (
+                <span className="ml-2 text-xs font-normal text-muted-foreground">
+                  (2 dari {response.keyFindings.length} temuan)
+                </span>
+              )}
             </h3>
           </div>
           <div className="space-y-3">
-            {response.keyFindings.map((finding, i) => (
+            {keyFindings.map((finding, i) => (
               <div
                 key={`finding-${i}`}
                 className="rounded-lg border border-border bg-white p-4 shadow-sm"
@@ -105,8 +116,8 @@ export function InsightPanel({ response }: InsightPanelProps) {
         </div>
       )}
 
-      {/* Business Risks */}
-      {response.businessRisks.length > 0 && (
+      {/* Business Risks — hidden in demo */}
+      {!isDemo && response.businessRisks.length > 0 && (
         <div>
           <div className="mb-3 flex items-center gap-2">
             <AlertTriangle className="h-4 w-4 text-warning" />
@@ -137,8 +148,8 @@ export function InsightPanel({ response }: InsightPanelProps) {
         </div>
       )}
 
-      {/* Recommendations */}
-      {response.recommendations.length > 0 && (
+      {/* Recommendations — hidden in demo */}
+      {!isDemo && response.recommendations.length > 0 && (
         <div>
           <div className="mb-3 flex items-center gap-2">
             <Target className="h-4 w-4 text-success" />
@@ -169,8 +180,8 @@ export function InsightPanel({ response }: InsightPanelProps) {
         </div>
       )}
 
-      {/* Limitations */}
-      {response.limitations.length > 0 && (
+      {/* Limitations — hidden in demo */}
+      {!isDemo && response.limitations.length > 0 && (
         <div>
           <div className="mb-3 flex items-center gap-2">
             <Info className="h-4 w-4 text-muted-foreground" />
@@ -190,6 +201,20 @@ export function InsightPanel({ response }: InsightPanelProps) {
               </div>
             ))}
           </div>
+        </div>
+      )}
+
+      {/* Demo Upgrade CTA */}
+      {isDemo && (
+        <div className="rounded-lg border border-purple-200 bg-purple-50 p-5 text-center">
+          <Sparkles className="mx-auto mb-2 h-6 w-6 text-purple-600" />
+          <p className="text-sm font-semibold text-navy-900">
+            Dapatkan Analisis Lengkap
+          </p>
+          <p className="mt-1 text-xs text-muted-foreground">
+            Beli laporan premium untuk melihat semua temuan, risiko bisnis,
+            rekomendasi, dan analisis mendalam.
+          </p>
         </div>
       )}
 

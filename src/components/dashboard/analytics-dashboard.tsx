@@ -207,7 +207,7 @@ export function AnalyticsDashboard({
         <InsightError error={insightState.error} onRetry={handleRetry} />
       )}
       {insightState.step === "done" && insightState.response && (
-        <InsightPanel response={insightState.response} />
+        <InsightPanel response={insightState.response} isDemo={true} />
       )}
 
       {/* Sales Trend Chart */}
