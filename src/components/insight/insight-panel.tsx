@@ -59,7 +59,7 @@ export function InsightPanel({ response }: InsightPanelProps) {
             AI Business Insights
           </h2>
           <p className="text-xs text-muted-foreground">
-            Dihasilkan oleh Gemini AI berdasarkan ringkasan analisis
+            Dihasilkan oleh AI berdasarkan ringkasan analisis
           </p>
         </div>
       </div>
